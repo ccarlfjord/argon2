@@ -1,8 +1,8 @@
 package argon2
 
 import (
-	"bytes"
 	"crypto/rand"
+	"crypto/subtle"
 	"errors"
 	"log/slog"
 	"time"
@@ -58,7 +58,7 @@ func (a *Argon2idParams) Validate(password string, hashedPassword []byte, salt [
 		slog.Debug("password validation complete", "time", time.Since(start).String())
 	}()
 	h := a.Hash(password, salt)
-	if bytes.Equal(h, hashedPassword) {
+	if subtle.ConstantTimeCompare(h, hashedPassword) == 1 {
 		return nil
 	}
 	return errors.New("password does not match")
